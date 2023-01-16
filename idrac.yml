@@ -5,6 +5,7 @@
     idrac_password: "calvin"
     new_idrac_ip: ""
     dns_idrac_name: "bipapp0012"
+    static_dns: "cdp.telkomsel.co.id"
   tasks:
   - name: Configure the iDRAC attributes for Syslog Setting
     dellemc.openmanage.idrac_attributes:
@@ -30,6 +31,22 @@
         EmailAlert.3.Enable: "Enabled"
         RemoteHosts.1.SMTPServerIPAddress: "10.38.37.73"
         RemoteHosts.1.SenderEmail: "delltbsesx01-idrac@telkomsel.co.id"
+  - name: Create Raid 1 Volume for OS
+    dellemc.openmanage.dellemc_idrac_storage_volume:
+      iidrac_ip: '{{ idrac_ip }}'
+      idrac_user: '{{ idrac_user }}'
+      idrac_password: '{{ idrac_password }}'
+      validate_certs: false
+      state: "create"
+      controller_id: "RAID.Slot.1-1"
+      volume_type: "RAID 1"
+      disk_cache_policy: "Enabled"
+      write_cache_policy: "WriteBack"
+      read_cache_policy: "ReadAhead"
+      raid_init_operation: "Fast"
+      volumes:
+        - drives:
+          location: [0,1]
   - name: Configure iDRAC network settings
     dellemc.openmanage.idrac_network:
       idrac_ip: '{{ idrac_ip }}'
@@ -47,4 +64,4 @@
       static_gateway: "10.53.191.254"
       static_net_mask: "255.255.248.0"
       dns_idrac_name: '{{ dns_idrac_name }}'
-      static_dns: "cdp.telkomsel.co.id"
+      static_dns: '{{ static_dns }}'
