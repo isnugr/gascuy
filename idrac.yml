@@ -5,7 +5,6 @@
     idrac_password: "calvin"
     new_idrac_ip: ""
     dns_idrac_name: "bipapp0012"
-    static_dns: "cdp.telkomsel.co.id"
   tasks:
   - name: Configure the iDRAC attributes for Syslog Setting
     dellemc.openmanage.idrac_attributes:
@@ -48,4 +47,4 @@
       static_gateway: "10.53.191.254"
       static_net_mask: "255.255.248.0"
       dns_idrac_name: '{{ dns_idrac_name }}'
-      static_dns: '{{ static_dns }}'
+      static_dns: "cdp.telkomsel.co.id"
