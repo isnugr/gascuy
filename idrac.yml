@@ -1,6 +1,6 @@
 - hosts: localhost
   var:
-    idrac_ip: "10.12.1.14"
+    idrac_ip: "192.168.0.120"
     idrac_user: "root"
     idrac_password: "calvin"
     new_idrac_ip: ""
