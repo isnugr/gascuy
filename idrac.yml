@@ -5,7 +5,8 @@
     idrac_password: "calvin"
     new_idrac_ip: ""
     dns_idrac_name: "bipapp0012"
-    static_dns: "cdp.telkomsel.co.id"
+    raid_slot: "RAID.Slot.1-1"
+    enclosure_slot: "Enclosure.Internal.0-1"
   tasks:
   - name: Configure the iDRAC attributes for Syslog Setting
     dellemc.openmanage.idrac_attributes:
@@ -31,14 +32,30 @@
         EmailAlert.3.Enable: "Enabled"
         RemoteHosts.1.SMTPServerIPAddress: "10.38.37.73"
         RemoteHosts.1.SenderEmail: "delltbsesx01-idrac@telkomsel.co.id"
+  - name: Convert physical disk to RAID
+    dellemc.openmanage.idrac_redfish_storage_controller:
+      baseuri: '{{ idrac_ip }}'
+      username: '{{ idrac_user }}'
+      password: '{{ idrac_password }}'
+      validate_certs: false
+      command: "ConvertToRAID"
+      target: ['Disk.Bay.0:{{ enclosure_slot }}:{{ raid_slot }}', 'Disk.Bay.1:{{ enclosure_slot }}:{{ raid_slot }}']
+  - name: Convert physical disk to non-RAID
+    dellemc.openmanage.idrac_redfish_storage_controller:
+      baseuri: '{{ idrac_ip }}'
+      username: '{{ idrac_user }}'
+      password: '{{ idrac_password }}'
+      validate_certs: false
+      command: "ConvertToNonRAID"
+      target: ['Disk.Bay.2:{{ enclosure_slot }}:{{ raid_slot }}', 'Disk.Bay.3:{{ enclosure_slot }}:{{ raid_slot }}', 'Disk.Bay.4:{{ enclosure_slot }}:{{ raid_slot }}', 'Disk.Bay.5:{{ enclosure_slot }}:{{ raid_slot }}', 'Disk.Bay.6:{{ enclosure_slot }}:{{ raid_slot }}', 'Disk.Bay.7:{{ enclosure_slot }}:{{ raid_slot }}', 'Disk.Bay.8:{{ enclosure_slot }}:{{ raid_slot }}', 'Disk.Bay.9:{{ enclosure_slot }}:{{ raid_slot }}', 'Disk.Bay.10:{{ enclosure_slot }}:{{ raid_slot }}']
   - name: Create Raid 1 Volume for OS
     dellemc.openmanage.dellemc_idrac_storage_volume:
-      iidrac_ip: '{{ idrac_ip }}'
+      idrac_ip: '{{ idrac_ip }}'
       idrac_user: '{{ idrac_user }}'
       idrac_password: '{{ idrac_password }}'
       validate_certs: false
       state: "create"
-      controller_id: "RAID.Slot.1-1"
+      controller_id: '{{ raid_slot }}'
       volume_type: "RAID 1"
       disk_cache_policy: "Enabled"
       write_cache_policy: "WriteBack"
@@ -46,7 +63,7 @@
       raid_init_operation: "Fast"
       volumes:
         - drives:
-          location: [0,1]
+          id: ['Disk.Bay.0:{{ enclosure_slot }}:{{ raid_slot }}', 'Disk.Bay.1:{{ enclosure_slot }}:{{ raid_slot }}']
   - name: Configure iDRAC network settings
     dellemc.openmanage.idrac_network:
       idrac_ip: '{{ idrac_ip }}'
